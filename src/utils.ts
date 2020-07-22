@@ -29,14 +29,13 @@ export async function zipFolder (dir: string, path: string): Promise<string> {
 
   const archive = archiver('zip')
   const s = createWriteStream(path)
-  const [dirs, files] = _(readdirSync(dir))
-    .filter(f => f !== '.output')
-    .partition(f => statSync(join(dir, f)).isDirectory())
-    .value()
+  const dirs = ["assets", "strings"];
+  const files = ["main.js", "config.json", "README.md"];
 
   for (const d of dirs) {
     archive.directory(join(dir, d), d)
   }
+  archive.append(null, { name: 'scripts/' });
 
   for (const f of files) {
     archive.file(join(dir, f), { name: f })
