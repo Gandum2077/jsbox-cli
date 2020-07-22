@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.build = exports.saveHost = exports.watch = exports.sync = exports.showHost = void 0;
+exports.upload = exports.build = exports.saveHost = exports.watch = exports.sync = exports.showHost = void 0;
 const chalk_1 = require("chalk");
 const config_1 = require("./config");
 const log = require("./log");
@@ -108,3 +108,31 @@ function build(path, ouputPath) {
     });
 }
 exports.build = build;
+function upload(path, boxPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.existsSync(path)) {
+            log.error(`${path} is not exist`);
+            process.exit(1);
+        }
+        const packageName = utils_1.getPackageName(path);
+        if (!boxPath) {
+            boxPath = yield utils_1.zipFolder(path, path_1.join(path, ".output", `${packageName}.box`));
+        }
+        if (!fs.existsSync(boxPath)) {
+            log.error(`box file is not exist`);
+            process.exit(1);
+        }
+        const formData = new FormData();
+        formData.append('files[]', fs.createReadStream(boxPath));
+        const host = config_1.getHost();
+        const [, err] = yield utils_1.tryCatch(got.post(`http://${host}/upload`, {
+            body: formData,
+            timeout: 10000
+        }));
+        if (err) {
+            log.error(err.message);
+            return;
+        }
+    });
+}
+exports.upload = upload;

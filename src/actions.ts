@@ -105,3 +105,29 @@ export async function build (path: string, ouputPath?: string) {
   await zipFolder(path, ouputPath)
   log.info(`Build in ${ouputPath}`)
 }
+
+export async function upload(path: string, boxPath?: string) {
+  if (!fs.existsSync(path)) {
+    log.error(`${path} is not exist`)
+    process.exit(1)
+  }
+  const packageName = getPackageName(path)
+  if (!boxPath) {
+    boxPath = await zipFolder(path, join(path, ".output", `${packageName}.box`))
+  }
+  if (!fs.existsSync(boxPath)) {
+    log.error(`box file is not exist`)
+    process.exit(1)
+  }
+  const formData = new FormData()
+  formData.append('files[]', fs.createReadStream(boxPath))
+  const host = getHost()
+  const [, err] = await tryCatch(got.post(`http://${host}/upload`, {
+    body: formData,
+    timeout: 10000
+  }))
+  if (err) {
+    log.error(err.message)
+    return
+  }
+}

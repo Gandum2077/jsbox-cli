@@ -1,7 +1,7 @@
 import * as program from 'commander'
 import * as net from 'net'
 import * as path from 'path'
-import { showHost, watch, saveHost, build } from './actions'
+import { showHost, watch, saveHost, build, upload } from './actions'
 import * as log from './log'
 
 program
@@ -48,4 +48,19 @@ program
     await build(dir, cmd.output)
   })
 
+program
+  .command('upload [dir]')
+  .option('-f, --file <file>', 'Specify the file to be uploaded')
+  .description('upload box package')
+  .action(async (dir: string, cmd) => {
+    const pwd = process.cwd()
+    dir = dir || '.'
+    if (cmd.file) {
+      const f = path.resolve(pwd, cmd.file)
+      await upload(dir, f)
+    } else {
+      await upload(dir)
+    }
+    
+  })
 program.parse(process.argv)

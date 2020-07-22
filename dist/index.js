@@ -51,4 +51,19 @@ program
     dir = path.resolve(pwd, dir);
     yield actions_1.build(dir, cmd.output);
 }));
+program
+    .command('upload [dir]')
+    .option('-f, --file <file>', 'Specify the file to be uploaded')
+    .description('upload box package')
+    .action((dir, cmd) => __awaiter(void 0, void 0, void 0, function* () {
+    const pwd = process.cwd();
+    dir = dir || '.';
+    if (cmd.file) {
+        const f = path.resolve(pwd, cmd.file);
+        yield actions_1.upload(dir, f);
+    }
+    else {
+        yield actions_1.upload(dir);
+    }
+}));
 program.parse(process.argv);
