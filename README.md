@@ -50,3 +50,13 @@ $ jsbox build ./dist
 # 自定义输出路径
 $ jsbox build ./dist -o ./dist/output.box
 ```
+
+将构建好的应用上传至JSBox
+
+```
+# 上传当前目录中默认生成到 .output 的 box 文件
+$ jsbox upload
+
+# 自定义指定目录和目标 box 文件
+$ jsbox upload ./dist -f ./dist/output.box
+```
